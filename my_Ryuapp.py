@@ -108,3 +108,15 @@ class Addmission_gateway(app_manager.RyuApp):
                                   in_port=in_port, actions=actions,
                                   data=msg.data)
         datapath.send_msg(out)
+
+    # * フローのドロップ
+    @set_ev_cls()
+    def del_flow(self, datapath, mac):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        match = parser.OFPMatch(dl_src=mac)
+
+        mod = parser.OFPFlowMod(datapath=datapath, match=match, cookie=0, command=ofproto.OFPFC_DELETE)
+
+        datapath.send_msg(mod)
