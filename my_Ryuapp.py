@@ -21,15 +21,18 @@ from ryu.ofproto import ofproto_v1_3
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
-
-class ExampleSwitch13(app_manager.RyuApp):
+# * クラスの定義
+class Addmission_gateway(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
+    # * 初期化
     def __init__(self, *args, **kwargs):
-        super(ExampleSwitch13, self).__init__(*args, **kwargs)
-        # initialize mac address table.
-        self.mac_to_port = {}
+        super(Addmission_gateway, self).__init__(*args, **kwargs)
+        # * initialize mac address table.
+        # self.mac_to_port = {}
 
+    # * Table-missフローエントリの追加
+    # * 全てのパケットにマッチするエントリ
     @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
     def switch_features_handler(self, ev):
         datapath = ev.msg.datapath
@@ -42,6 +45,8 @@ class ExampleSwitch13(app_manager.RyuApp):
                                           ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
 
+    # * 優先度0（最低）を指定してFlow_Modメッセージを送信
+    # * フローエントリの追加処理
     def add_flow(self, datapath, priority, match, actions):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
@@ -53,6 +58,7 @@ class ExampleSwitch13(app_manager.RyuApp):
                                 match=match, instructions=inst)
         datapath.send_msg(mod)
 
+    # * Packet_Inイベントハンドラの作成
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
         msg = ev.msg
@@ -70,6 +76,7 @@ class ExampleSwitch13(app_manager.RyuApp):
         dst = eth_pkt.dst
         src = eth_pkt.src
 
+        # * MACアドレステーブルの更新
         # get the received port number from packet_in message.
         in_port = msg.match['in_port']
 
@@ -78,6 +85,7 @@ class ExampleSwitch13(app_manager.RyuApp):
         # learn a mac address to avoid FLOOD next time.
         self.mac_to_port[dpid][src] = in_port
 
+        # * 転送先ポートの更新
         # if the destination mac address is already learned,
         # decide which port to output the packet, otherwise FLOOD.
         if dst in self.mac_to_port[dpid]:
@@ -93,6 +101,7 @@ class ExampleSwitch13(app_manager.RyuApp):
             match = parser.OFPMatch(in_port=in_port, eth_dst=dst)
             self.add_flow(datapath, 1, match, actions)
 
+        # * パケットの転送
         # construct packet_out message and send it.
         out = parser.OFPPacketOut(datapath=datapath,
                                   buffer_id=ofproto.OFP_NO_BUFFER,
