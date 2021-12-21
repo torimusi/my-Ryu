@@ -120,3 +120,14 @@ class Addmission_gateway(app_manager.RyuApp):
         mod = parser.OFPFlowMod(datapath=datapath, match=match, cookie=0, command=ofproto.OFPFC_DELETE)
 
         datapath.send_msg(mod)
+
+    # * アドミッション制御
+    def addmission_control():
+        # Cat1のQoSが満たされていない時
+            # ドロップするフローを探す
+            # フローをドロップ
+            del_flow()
+            # dc + 1
+            # Cat1のQoSを確認
+
+    
