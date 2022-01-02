@@ -33,17 +33,20 @@ class Addmission_gateway(app_manager.RyuApp):
 
     # * Table-missフローエントリの追加
     # * 全てのパケットにマッチするエントリ
-    @set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
-    def switch_features_handler(self, ev):
-        datapath = ev.msg.datapath
-        ofproto = datapath.ofproto
-        parser = datapath.ofproto_parser
+    #@set_ev_cls(ofp_event.EventOFPSwitchFeatures, CONFIG_DISPATCHER)
+    #def switch_features_handler(self, ev):
+    #    datapath = ev.msg.datapath
+    #    ofproto = datapath.ofproto
+    #    parser = datapath.ofproto_parser
 
         # install the table-miss flow entry.
-        match = parser.OFPMatch()
-        actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
-                                          ofproto.OFPCML_NO_BUFFER)]
-        self.add_flow(datapath, 0, match, actions)
+        #match = parser.OFPMatch()
+        #actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER,
+        #                                  ofproto.OFPCML_NO_BUFFER)]
+        #self.add_flow(datapath, 0, match, actions)
+
+    # * フロー登録
+    
 
     # * 優先度0（最低）を指定してFlow_Modメッセージを送信
     # * フローエントリの追加処理

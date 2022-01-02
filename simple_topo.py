@@ -19,16 +19,14 @@ class MyTopo( Topo ):
         "Create custom topo."
 
         # Add hosts and switches
-        gateway1 = self.addSwitch( 'g1' )
-        gateway2 = self.addSwitch( 'g2' )
+        gateway = self.addSwitch( 'g1' )
 
         serv = self.addHost(' sv ')
         
         Switch = self.addSwitch( 's1' )
         
         # Add links
-        self.addLink( gateway1, Switch )
-        self.addLink( gateway2, Switch )
+        self.addLink( gateway, Switch )
         
         self.addLink( Switch, serv )
         
