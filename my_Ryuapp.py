@@ -46,7 +46,12 @@ class Addmission_gateway(app_manager.RyuApp):
         #self.add_flow(datapath, 0, match, actions)
 
     # * フロー登録
-    
+    def to_server_flow(self, datapath):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        match = parser.OFPMatch(in_port=HOST1_PORT)
+        actions = [parser.OFPActionOutput(HOST2_PORT)]
 
     # * 優先度0（最低）を指定してFlow_Modメッセージを送信
     # * フローエントリの追加処理
