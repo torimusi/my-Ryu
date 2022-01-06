@@ -7,12 +7,12 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
 # クラスの定義
-class Addmission_gateway(app_manager.RyuApp):
+class gateway(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     # 初期化
     def __init__(self, *args, **kwargs):
-        super(Addmission_gateway, self).__init__(*args, **kwargs)
+        super(gateway, self).__init__(*args, **kwargs)
 
     # Packet_Inイベントハンドラの作成
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
@@ -48,11 +48,15 @@ class Addmission_gateway(app_manager.RyuApp):
 
     # アドミッション制御
     def addmission_control():
+
+
         # Cat1のQoSが満たされていない時
+        if 帯域 < 閾値
             # ドロップするフローを探す
             # フローをドロップ
             del_flow()
             # dc + 1
+            フロー.dc + 1
             # Cat1のQoSを確認
 
     
