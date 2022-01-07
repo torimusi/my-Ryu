@@ -23,8 +23,21 @@ class gateway(app_manager.RyuApp):
         parser = datapath.ofproto_parser
 
         # 優先度を設定し、ルータへ転送する
-        mod = 
-        self.add_flow
+        if 優先度 = 1
+            mod = 
+            self.add_flow
+
+        if 優先度 = 2
+            mod = 
+            self.add_flow
+
+        if 優先度 = 3
+            mod = 
+            self.add_flow
+
+        if 優先度 = 4
+            mod = 
+            self.add_flow
 
     # フロー登録
     def add_flow(self, datapath):
