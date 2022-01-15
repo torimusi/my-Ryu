@@ -22,30 +22,52 @@ class gateway(app_manager.RyuApp):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
-        # 優先度を設定し、ルータへ転送する
-        if 優先度 = 1
-            mod = 
-            self.add_flow
-
-        if 優先度 = 2
-            mod = 
-            self.add_flow
-
-        if 優先度 = 3
-            mod = 
-            self.add_flow
-
-        if 優先度 = 4
-            mod = 
-            self.add_flow
+        self.add_flow(datapath, priority, match, actions)
 
     # フロー登録
-    def add_flow(self, datapath):
+    def add_flow(self, datapath, priority, match, actions):
         ofproto = datapath.ofproto
         parser = datapath.ofproto_parser
 
+        # 優先度1
         match = parser.OFPMatch(in_port=HOST1_PORT)
         actions = [parser.OFPActionOutput(HOST2_PORT)]
+
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
+
+        mod = parser.OFPFlowMod(datapath=datapath, priority=priority, match=match, instructions=inst)
+
+        datapath.send_msg(mod)
+
+        # 優先度2
+        match = parser.OFPMatch(in_port=HOST1_PORT)
+        actions = [parser.OFPActionOutput(HOST2_PORT)]
+
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
+
+        mod = parser.OFPFlowMod(datapath=datapath, priority=priority, match=match, instructions=inst)
+
+        datapath.send_msg(mod)
+
+        # 優先度3
+        match = parser.OFPMatch(in_port=HOST1_PORT)
+        actions = [parser.OFPActionOutput(HOST2_PORT)]
+
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
+
+        mod = parser.OFPFlowMod(datapath=datapath, priority=priority, match=match, instructions=inst)
+
+        datapath.send_msg(mod)
+
+        # 優先度4
+        match = parser.OFPMatch(in_port=HOST1_PORT)
+        actions = [parser.OFPActionOutput(HOST2_PORT)]
+
+        inst = [parser.OFPInstructionActions(ofproto.OFPIT_APPLY_ACTIONS, actions)]
+
+        mod = parser.OFPFlowMod(datapath=datapath, priority=priority, match=match, instructions=inst)
+
+        datapath.send_msg(mod)
 
     # フロー削除
     @set_ev_cls()
