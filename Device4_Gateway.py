@@ -55,7 +55,7 @@ class Device4Gateway(app_manager.RyuApp):
         self.datapath.send_msg(mod)
 
     # フローを削除
-    def del_flow():
+    def del_flow(self, port):
         ofproto = self.datapath.ofproto
         parser = self.datapath.ofproto_parser
 
@@ -74,13 +74,13 @@ class Device4Gateway(app_manager.RyuApp):
 
             # フローをドロップ
             drop_flow()
+            dc + 1
+
+            # 優先度1のQoSが満たされたら
 
             # ドロップ確認後、フローを削除
             del_flow()
 
-            # dc + 1
-            フロー.dc + 1
-            # Cat1のQoSを確認
 
     
     
