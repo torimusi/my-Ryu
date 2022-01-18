@@ -1,3 +1,4 @@
+from distutils import command
 from ryu.base import app_manager
 from ryu.controller import ofp_event
 from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
@@ -41,8 +42,20 @@ class Device4Gateway(app_manager.RyuApp):
 
         datapath.send_msg(mod)
 
-    # フロー削除
-    def del_flow(self, port):
+    # フローをドロップ
+    def drop_flow(self, port):
+        ofproto = self.datapath.ofproto
+        parser = self.datapath.ofproto_parser
+
+        match = parser.OFPMatch()
+        actions = []
+
+        mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_MODIFY, actions=actions)
+
+        self.datapath.send_msg(mod)
+
+    # フローを削除
+    def del_flow():
         ofproto = self.datapath.ofproto
         parser = self.datapath.ofproto_parser
 
@@ -55,12 +68,16 @@ class Device4Gateway(app_manager.RyuApp):
     # アドミッション制御
     def addmission_control():
 
-
         # Cat1のQoSが満たされていない時
         if 帯域 < 閾値
             # ドロップするフローを探す
+
             # フローをドロップ
+            drop_flow()
+
+            # ドロップ確認後、フローを削除
             del_flow()
+
             # dc + 1
             フロー.dc + 1
             # Cat1のQoSを確認
