@@ -83,12 +83,14 @@ class Device4Gateway(app_manager.RyuApp):
         parser = self.datapath.ofproto_parser
 
         # ポートを見てフロー登録、送信先はルータ
-        match = parser.OFPMatch(in_port=in_port, dl_src=src, dl_dst=dst)
-        actions = [parser.OFPActionOutput(Router)]
+        match = parser.OFPMatch(in_port=port, dl_type=types.ETH_TYPE_IP, dl_dst=haddr_to_bin(ROUTER_MAC))
+        actions = [parser.OFPActionSetNWTos(self.qos[port][TOS]), parser.OFPActionOutput(ROUTER_PORT)]
 
-        mod = parser.OFPFlowMod(datapath=datapath, match=match, command=ofproto.OFPFC_ADD, actions=actions)
+        mod = parser.OFPFlowMod(datapath=self.datapath, match=match, command=ofproto.OFPFC_ADD, actions=actions)
 
-        datapath.send_msg(mod)
+        self.datapath.send_msg(mod)
+
+        self.qos[port][QOS_FLAG] = QOS_ON
 
     # フローをドロップ
     def drop_flow(self, port):
