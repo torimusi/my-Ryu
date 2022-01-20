@@ -9,24 +9,6 @@ from ryu.ofproto import ofproto_v1_3
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
-# 各ポートのアドミッション制御の基準となる通信量を規定
-self.base = {PRIORITY_1_PORT:PRIORITY_1_TRAFFIC,
-             PRIORITY_2_PORT:PRIORITY_2_TRAFFIC,
-             PRIORITY_3_PORT:PRIORITY_3_TRAFFIC,
-             PRIORITY_4_PORT:PRIORITY_4_TRAFFIC}
-
-# 各ポートの通信量を保存
-self.traffic = {PRIORITY_1_PORT:0,
-                PRIORITY_2_PORT:0,
-                PRIORITY_3_PORT:0,
-                PRIORITY_4_PORT:0,}
-
-# 前回取得した通信量、QoS設定フラグ、ToSフィールドの設定値を保存
-self.qos = {PRIORITY_1_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_1_TOS},
-            PRIORITY_2_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_2_TOS},
-            PRIORITY_3_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_3_TOS},
-            PRIORITY_4_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_4_TOS}}
-
 # クラスの定義
 class Device4Gateway(app_manager.RyuApp):
     OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
@@ -34,6 +16,26 @@ class Device4Gateway(app_manager.RyuApp):
     # 初期化
     def __init__(self, *args, **kwargs):
         super(Device4Gateway, self).__init__(*args, **kwargs)
+
+        self.datapath = {}
+
+        # 各ポートのアドミッション制御の基準となる通信量を規定
+        self.base = {PRIORITY_1_PORT:PRIORITY_1_TRAFFIC,
+                     PRIORITY_2_PORT:PRIORITY_2_TRAFFIC,
+                     PRIORITY_3_PORT:PRIORITY_3_TRAFFIC,
+                     PRIORITY_4_PORT:PRIORITY_4_TRAFFIC}
+
+        # 各ポートの通信量を保存
+        self.traffic = {PRIORITY_1_PORT:0,
+                        PRIORITY_2_PORT:0,
+                        PRIORITY_3_PORT:0,
+                        PRIORITY_4_PORT:0,}
+
+        # 前回取得した通信量、QoS設定フラグ、ToSフィールドの設定値を保存
+        self.qos = {PRIORITY_1_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_1_TOS},
+                    PRIORITY_2_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_2_TOS},
+                    PRIORITY_3_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_3_TOS},
+                    PRIORITY_4_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_4_TOS}}
 
     # Packet_Inイベントハンドラの作成
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
