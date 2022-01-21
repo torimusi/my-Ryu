@@ -164,10 +164,13 @@ class Device4Gateway(switch_hub.SwitchHub):
             hub.sleep(REPLY_TIME)
             self.qos[port][TRAFFIC] = self.traffic[port]
     
-
-    
+    # 各ポートの通信量更新を更新する
+    def renew_traffic(self):
+        for port in self.traffic.keys():
+            self.qos[port][TRAFFIC] = self.traffic[port]
 
     # フローをドロップ
+    # フローの処理内容を空白にする
     def drop_flow(self, port):
         ofproto = self.datapath.ofproto
         parser = self.datapath.ofproto_parser
