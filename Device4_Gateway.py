@@ -73,7 +73,8 @@ class Device4Gateway(switch_hub.SwitchHub):
     def _state_change_handler(self, ev):
         self.datapath = ev.datapath
 
-    # モニタスレッド、ポートの統計情報を取得・辞書に通信量保存
+    # モニタスレッド
+    # ポートの統計情報を取得・辞書に通信量保存
     def _qos_monitor(self):
         # 設定初期化
         while True:
@@ -91,7 +92,14 @@ class Device4Gateway(switch_hub.SwitchHub):
             self.renew_traffic()
             hub.sleep(POLLING_TIME)
 
-    
+    # PortStatsReplyイベントハンドラの作成
+    # PortStatsReplyメッセージを受信したら各ポートの通信量を更新
+    @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
+    def _port_stats_reply_handler(self, ev):
+        body = ev.msg.body
+        for stat in body:
+            if stat.port_no in self.traffic.keys():
+                self.traffic[stat.port_no] = stat.rx_bytes + stat.tx_bytes
 
 
 
