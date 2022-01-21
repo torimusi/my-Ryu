@@ -92,6 +92,10 @@ class Device4Gateway(switch_hub.SwitchHub):
             self.renew_traffic()
             hub.sleep(POLLING_TIME)
 
+    def stats_request(self, datapath, port):
+        req = datapath.ofproto_parser.OFPPortStatsRequest(datapath, 0, port)
+        datapath.send_msg(req)
+
     # PortStatsReplyイベントハンドラの作成
     # PortStatsReplyメッセージを受信したら各ポートの通信量を更新
     @set_ev_cls(ofp_event.EventOFPPortStatsReply, MAIN_DISPATCHER)
@@ -100,6 +104,15 @@ class Device4Gateway(switch_hub.SwitchHub):
         for stat in body:
             if stat.port_no in self.traffic.keys():
                 self.traffic[stat.port_no] = stat.rx_bytes + stat.tx_bytes
+
+    # QoS設定
+    # 各ポートの通信量が既定値を超えた場合、ToSフィールドを書き換える
+    def qos_setting(self):
+        for port in self.traffic.keys():
+            if self.tarffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
+                if self.qos[port][QOS_FLAG] == QOS_OFF:
+                    self.add_qos(port)
+
 
 
 
