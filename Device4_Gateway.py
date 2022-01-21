@@ -113,6 +113,28 @@ class Device4Gateway(switch_hub.SwitchHub):
                 if self.qos[port][QOS_FLAG] == QOS_OFF:
                     self.add_qos(port)
 
+    # フロー登録
+    # フローを登録し、QoS設定フラグをONに更新する
+    def add_qos(self, port):
+        ofproto = self.datapath.ofproto
+        parser = self.datapath.ofproto_parser
+
+        match = parser.OFPMatch(in_port=port, dl_type=types.ETH_TYPE_IP,
+        dl_dst=haddr_to_bin(ROUTER_MAC))
+
+        actions = [parser.OFPActionSetNwTos(self.qos[port][TOS]), parser.OFPActionOutput(ROUTER_PORT)]
+
+        mod = parser.OFPFlowMod(datapath=self.datapath, 
+                                match=match, cookie=0, 
+                                command=ofproto.OFPFC_ADD, 
+                                idle_timeout=QOS_IDLE_TIME,
+                                priority=QOS_PRIORITY, 
+                                flags=ofproto.OFPFF_SEND_FLOW_REM, 
+                                actions=actions)
+
+        self.datapath.send_msg(mod)
+
+        self.qos[port][QOS_FLAG] = QOS_ON
 
 
 
