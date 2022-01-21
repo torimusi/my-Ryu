@@ -151,7 +151,18 @@ class Device4Gateway(switch_hub.SwitchHub):
 
         self.datapath.send_msg(mod)
 
-
+    # FlowRemovedイベントハンドラの作成
+    # FLowRemovedイベントが発生したらQoS設定フラグをOFFに更新する
+    # idle_timeoutによるフロー削除なら、対象ポートの統計情報を取得し通信量を更新する
+    @set_ev_cls(ofp_event.EventOFPFlowRemoved, MAIN_DISPATCHER)
+    def _flow_removed_handler(self, ev):
+        msg = ev.msg
+        port = msg.match.in_port
+        self.qos[port][QOS_FLAG] = QOS_OFF
+        if msg.reason == self.datapath.ofproto.OFPRR_IDLE_TIMEOUT:
+            self.stats_request(self.datapath, port)
+            hub.sleep(REPLY_TIME)
+            self.qos[port][TRAFFIC] = self.traffic[port]
     
 
     
