@@ -136,35 +136,25 @@ class Device4Gateway(switch_hub.SwitchHub):
 
         self.qos[port][QOS_FLAG] = QOS_ON
 
-
-
-
-    # Packet_Inイベントハンドラの作成
-    @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
-    def _packet_in_handler(self, ev):
-        msg = ev.msg
-        datapath = msg.datapath
-        ofproto = datapath.ofproto
-        parser = datapath.ofproto_parser
-
-        self.add_flow(datapath, port)
-
-    # フロー登録
-    # 各ポートに各優先度のデバイスが接続
-    # 送信先は外部ルータ
-    def add_flow(self, port):
+    # フロー削除
+    def del_qos(self, port):
         ofproto = self.datapath.ofproto
         parser = self.datapath.ofproto_parser
 
-        # ポートを見てフロー登録、送信先はルータ
         match = parser.OFPMatch(in_port=port, dl_type=types.ETH_TYPE_IP, dl_dst=haddr_to_bin(ROUTER_MAC))
-        actions = [parser.OFPActionSetNWTos(self.qos[port][TOS]), parser.OFPActionOutput(ROUTER_PORT)]
 
-        mod = parser.OFPFlowMod(datapath=self.datapath, match=match, command=ofproto.OFPFC_ADD, actions=actions)
+        mod = parser.OFPFlowMod(datapath=self.datapath,
+                                match=match, cookie=0,
+                                command=ofproto.OFPFC_DELETE,
+                                idle_timeout=QOS_IDLE_TIME,
+                                priority=QOS_PRIORITY)
 
         self.datapath.send_msg(mod)
 
-        self.qos[port][QOS_FLAG] = QOS_ON
+
+    
+
+    
 
     # フローをドロップ
     def drop_flow(self, port):
@@ -175,17 +165,6 @@ class Device4Gateway(switch_hub.SwitchHub):
         actions = []
 
         mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_MODIFY, actions=actions)
-
-        self.datapath.send_msg(mod)
-
-    # フローを削除
-    def del_flow(self, port):
-        ofproto = self.datapath.ofproto
-        parser = self.datapath.ofproto_parser
-
-        match = parser.OFPMatch()
-
-        mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_DELETE)
 
         self.datapath.send_msg(mod)
 
