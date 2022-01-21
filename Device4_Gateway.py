@@ -11,6 +11,10 @@ from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
 
 # アドミッション制御に用いる変数を定義
+INIT_TIME    = 10
+POLLING_TIME = 300
+REPLY_TIME   = 3
+
 QOS_FLAG      = 'flag'
 QOS_OFF       = 0
 QOS_ON        = 1
@@ -114,6 +118,24 @@ class Device4Gateway(app_manager.RyuApp):
         mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_DELETE)
 
         self.datapath.send_msg(mod)
+
+    # モニタスレッド、ポートの統計情報を取得・辞書に通信量保存
+    def _qos_monitor(self):
+        # 設定初期化
+        while True:
+            if self.datapath:
+                self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
+                self.renew_traffic()
+                break
+            hub.sleep(INIT_TIME)
+
+        hub.sleep(POLLING_TIME)
+        while True:
+            self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
+            hub.sleep(REPLY_TIME)
+            self.qos_setting()
+            self.renew_traffic()
+            hub.sleep(POLLING_TIME)
 
     # アドミッション制御
     def addmission_control():
