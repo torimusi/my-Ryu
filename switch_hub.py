@@ -70,7 +70,7 @@ class SwitchHub(app_manager.RyuApp):
 
         if self.mac_to_port[dpid][src] != msg.in_port:
             self.del_flow(datapath, haddr_to_bin(src))
-            self.modify_flow((datapath, haddr_to_bin(src), msg.in_port)
+            self.modify_flow(datapath, haddr_to_bin(src), msg.in_port)
             self.mac_to_port[dpid][src] = msg.in_port
 
         if dst in self.mac_to_port[dpid]:

@@ -1,14 +1,12 @@
 # 4つのデバイスと外部ルータをつなぐゲートウェイ
+from ryu.app import switch_hub
 
-from distutils import command
-from termios import TOSTOP
-from ryu.base import app_manager
 from ryu.controller import ofp_event
-from ryu.controller.handler import CONFIG_DISPATCHER, MAIN_DISPATCHER
+from ryu.controller.handler import MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
-from ryu.ofproto import ofproto_v1_3
-from ryu.lib.packet import packet
-from ryu.lib.packet import ethernet
+from ryu.lib import hub
+from ryu.lib.mac import haddr_to_bin
+from ryu.lib.packet import ether_types as types
 
 # アドミッション制御に用いる変数を定義
 INIT_TIME    = 10
@@ -42,8 +40,7 @@ PRIORITY_3_PORT = 4
 PRIORITY_4_PORT = 5
 
 # クラスの定義
-class Device4Gateway(app_manager.RyuApp):
-    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
+class Device4Gateway(switch_hub.SwitchHub):
 
     # 初期化
     def __init__(self, *args, **kwargs):
@@ -68,6 +65,36 @@ class Device4Gateway(app_manager.RyuApp):
                     PRIORITY_2_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_2_TOS},
                     PRIORITY_3_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_3_TOS},
                     PRIORITY_4_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_4_TOS}}
+
+        # モニタスレッド
+        self.monitor_thread = hub.spawn(self._qos_monitor)
+
+    @set_ev_cls(ofp_event.EventOFPStateChange, MAIN_DISPATCHER)
+    def _state_change_handler(self, ev):
+        self.datapath = ev.datapath
+
+    # モニタスレッド、ポートの統計情報を取得・辞書に通信量保存
+    def _qos_monitor(self):
+        # 設定初期化
+        while True:
+            if self.datapath:
+                self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
+                self.renew_traffic()
+                break
+            hub.sleep(INIT_TIME)
+
+        hub.sleep(POLLING_TIME)
+        while True:
+            self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
+            hub.sleep(REPLY_TIME)
+            self.qos_setting()
+            self.renew_traffic()
+            hub.sleep(POLLING_TIME)
+
+    
+
+
+
 
     # Packet_Inイベントハンドラの作成
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
@@ -118,24 +145,6 @@ class Device4Gateway(app_manager.RyuApp):
         mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_DELETE)
 
         self.datapath.send_msg(mod)
-
-    # モニタスレッド、ポートの統計情報を取得・辞書に通信量保存
-    def _qos_monitor(self):
-        # 設定初期化
-        while True:
-            if self.datapath:
-                self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
-                self.renew_traffic()
-                break
-            hub.sleep(INIT_TIME)
-
-        hub.sleep(POLLING_TIME)
-        while True:
-            self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
-            hub.sleep(REPLY_TIME)
-            self.qos_setting()
-            self.renew_traffic()
-            hub.sleep(POLLING_TIME)
 
     # アドミッション制御
     def addmission_control():
