@@ -3,7 +3,7 @@ from ryu.controller import mac_to_port
 from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER
 from ryu.controller.handler import set_ev_cls
-from ryu.ofproto import ofproto_v1_0
+from ryu.ofproto import ofproto_v1_3
 from ryu.lib.mac import haddr_to_bin
 from ryu.lib.packet import packet
 from ryu.lib.packet import ethernet
@@ -12,7 +12,7 @@ MAC_IDLE_TIME = 300
 
 
 class SwitchHub(app_manager.RyuApp):
-    OFP_VERSIONS = [ofproto_v1_0.OFP_VERSION]
+    OFP_VERSIONS = [ofproto_v1_3.OFP_VERSION]
 
     def __init__(self, *args, **kwargs):
         super(SwitchHub, self).__init__(*args, **kwargs)
