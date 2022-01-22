@@ -39,6 +39,11 @@ PRIORITY_2_PORT = 3
 PRIORITY_3_PORT = 4
 PRIORITY_4_PORT = 5
 
+PRIORITY_1_DC = 0
+PRIORITY_2_DC = 0
+PRIORITY_3_DC = 0
+PRIORITY_4_DC = 0
+
 # クラスの定義
 class Device4Gateway(switch_hub.SwitchHub):
 
@@ -65,6 +70,12 @@ class Device4Gateway(switch_hub.SwitchHub):
                     PRIORITY_2_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_2_TOS},
                     PRIORITY_3_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_3_TOS},
                     PRIORITY_4_PORT:{TRAFFIC:0, QOS_FLAG:QOS_OFF, TOS:PRIORITY_4_TOS}}
+
+        # 各優先度フローのドロップされた回数を保存
+        self.dc = {PRIORITY_1_PORT:PRIORITY_1_DC,
+                   PRIORITY_2_PORT:PRIORITY_2_DC,
+                   PRIORITY_3_PORT:PRIORITY_3_DC,
+                   PRIORITY_4_PORT:PRIORITY_4_DC}
 
         # モニタスレッド
         self.monitor_thread = hub.spawn(self._qos_monitor)
