@@ -120,7 +120,7 @@ class Device4Gateway(switch_hub.SwitchHub):
     # 各ポートの通信量が既定値を超えた場合、ToSフィールドを書き換える
     def qos_setting(self):
         for port in self.traffic.keys():
-            if self.tarffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
+            if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
                 if self.qos[port][QOS_FLAG] == QOS_OFF:
                     self.add_qos(port)
 
@@ -194,21 +194,24 @@ class Device4Gateway(switch_hub.SwitchHub):
         self.datapath.send_msg(mod)
 
     # アドミッション制御
-    def addmission_control():
+    def addmission_control(self):
 
         # Cat1のQoSが満たされていない時
-        if 帯域 < 閾値
-            # ドロップするフローを探す
+        # ループから抜け出せなさそう、時間で見たほうがいい？
+        if self.qos[PRIORITY_1_PORT][QOS_FLAG] == QOS_ON:
+            while self.qos[PRIORITY_1_PORT][TOS] < self.traffic[1]:
+                
+                # ドロップするフローを選択
 
-            # フローをドロップ
-            drop_flow()
-            dc + 1
+                # dcと優先度で重み付け？
+                # 2*dc 3*dc 4*dc の大小で比較みたいな感じ？
 
-            # 優先度1のQoSが満たされたら
+                # フローをドロップ
+                drop_flow(self, port)
+                self.dc[port] + 1
 
-            # ドロップ確認後、フローを削除
-            del_flow()
-
+            # ドロップされたフローを消去
+            del_qos(self, port)
 
     
     
