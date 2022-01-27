@@ -196,22 +196,21 @@ class Device4Gateway(switch_hub.SwitchHub):
     # アドミッション制御
     def addmission_control(self):
 
-        # Cat1のQoSが満たされていない時
-        # ループから抜け出せなさそう、時間で見たほうがいい？
-        if self.qos[PRIORITY_1_PORT][QOS_FLAG] == QOS_ON:
-            while self.qos[PRIORITY_1_PORT][TOS] < self.traffic[1]:
+        for port in self.traffic.keys():
+
+            if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
+                if self.qos[port][QOS_FLAG] == QOS_OFF:
+                    self.add_qos(port)
                 
-                # ドロップするフローを選択
+                    # フローをドロップ
+                    drop_flow(self, port)
+                    self.dc[port] = self.dc[port] + 1
+
+                    # ドロップされたフローを消去
+                    del_qos(self, port)
 
                 # dcと優先度で重み付け？
                 # 2*dc 3*dc 4*dc の大小で比較みたいな感じ？
-
-                # フローをドロップ
-                drop_flow(self, port)
-                self.dc[port] + 1
-
-            # ドロップされたフローを消去
-            del_qos(self, port)
 
     
     
