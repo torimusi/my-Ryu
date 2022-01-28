@@ -186,7 +186,7 @@ class Device4Gateway(switch_hub.SwitchHub):
         ofproto = self.datapath.ofproto
         parser = self.datapath.ofproto_parser
 
-        match = parser.OFPMatch()
+        match = parser.OFPMatch(in_port=port, dl_type=types.ETH_TYPE_IP, dl_dst=haddr_to_bin(ROUTER_MAC))
         actions = []
 
         mod = parser.OFPFlowMod(datapath=self.datapath, match=match, cookie=0, command=ofproto.OFPFC_MODIFY, actions=actions)
@@ -196,21 +196,35 @@ class Device4Gateway(switch_hub.SwitchHub):
     # アドミッション制御
     def addmission_control(self):
 
-        for port in self.traffic.keys():
+        w2 = self.dc[PRIORITY_2_PORT] * (5 - PRIORITY_2_PORT)
 
-            if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
-                if self.qos[port][QOS_FLAG] == QOS_OFF:
-                    self.add_qos(port)
-                
-                    # フローをドロップ
-                    drop_flow(self, port)
-                    self.dc[port] = self.dc[port] + 1
+        w3 = self.dc[PRIORITY_3_PORT] * (5 - PRIORITY_3_PORT)
 
-                    # ドロップされたフローを消去
-                    del_qos(self, port)
+        w4 = self.dc[PRIORITY_4_PORT] * (5 - PRIORITY_4_PORT)
 
-                # dcと優先度で重み付け？
-                # 2*dc 3*dc 4*dc の大小で比較みたいな感じ？
+        # 1が通信帯域ないと
+        if self.traffic[PRIORITY_1_PORT] - self.qos[PRIORITY_1_PORT][TRAFFIC] < self.base[PRIORITY_1_PORT]:
+
+            # 2~4をドロップ
+            # dcを用いてドロップするフローを選択
+            if min([w2, w3, w4]) == w2:
+                self.drop_flow(self, PRIORITY_2_PORT)
+            elif min([w2, w3, w4]) == w3:
+                self.drop_flow(self, PRIORITY_3_PORT)
+            elif min([w2, w3, w4]) == w4:
+                self.drop_flow(self, PRIORITY_4_PORT)
+
+
+            # 2が通信帯域ないと
+            if self.traffic[PRIORITY_2_PORT] - self.qos[PRIORITY_2_PORT][TRAFFIC] < self.base[PRIORITY_2_PORT]:
+
+                # 3~4をドロップ
+                # dcを用いてドロップするフローを選択
+                if min([w3, w4]) == w3:
+                    self.drop_flow(self, PRIORITY_3_PORT)
+                if min([w3, w4]) == w4:
+                    self.drop_flow(self, PRIORITY_4_PORT)
+
 
     
     
