@@ -10,19 +10,19 @@ from ryu.lib.packet import ether_types as types
 
 # アドミッション制御に用いる変数を定義
 INIT_TIME    = 10
-POLLING_TIME = 300
+POLLING_TIME = 60
 REPLY_TIME   = 3
 
 QOS_FLAG      = 'flag'
 QOS_OFF       = 0
 QOS_ON        = 1
-QOS_IDLE_TIME = 120
+QOS_IDLE_TIME = 0
 QOS_PRIORITY  = 65535
 
 TRAFFIC = 'traffic'
 PRIORITY_1_TRAFFIC = 100 * (10 ** 6)
 PRIORITY_2_TRAFFIC = 300 * (10 ** 6)
-PRIORITY_3_TRAFFIC = 300 * (10 ** 6)
+PRIORITY_3_TRAFFIC = 200 * (10 ** 6)
 PRIORITY_4_TRAFFIC = 100 * (10 ** 6)
 
 TOS            = 'tos'
@@ -99,7 +99,7 @@ class Device4Gateway(switch_hub.SwitchHub):
         while True:
             self.stats_request(self.datapath, self.datapath.ofproto.OFPP_NONE)
             hub.sleep(REPLY_TIME)
-            self.qos_setting()
+            self.addmission_control()
             self.renew_traffic()
             hub.sleep(POLLING_TIME)
 
