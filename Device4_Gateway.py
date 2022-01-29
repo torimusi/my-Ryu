@@ -118,11 +118,11 @@ class Device4Gateway(switch_hub.SwitchHub):
 
     # QoS設定
     # 各ポートの通信量が既定値を超えた場合、ToSフィールドを書き換える
-    def qos_setting(self):
-        for port in self.traffic.keys():
-            if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
-                if self.qos[port][QOS_FLAG] == QOS_OFF:
-                    self.add_qos(port)
+    #def qos_setting(self):
+    #    for port in self.traffic.keys():
+    #        if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
+    #            if self.qos[port][QOS_FLAG] == QOS_OFF:
+    #                self.add_qos(port)
 
     # フロー登録
     # フローを登録し、QoS設定フラグをONに更新する
@@ -170,6 +170,7 @@ class Device4Gateway(switch_hub.SwitchHub):
         msg = ev.msg
         port = msg.match.in_port
         self.qos[port][QOS_FLAG] = QOS_OFF
+        self.dc[port] += 1
         if msg.reason == self.datapath.ofproto.OFPRR_IDLE_TIMEOUT:
             self.stats_request(self.datapath, port)
             hub.sleep(REPLY_TIME)
@@ -202,18 +203,30 @@ class Device4Gateway(switch_hub.SwitchHub):
 
         w4 = self.dc[PRIORITY_4_PORT] * (5 - PRIORITY_4_PORT)
 
+        # 消したフローを再登録
+        for port in self.traffic.keys():
+            if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
+                if self.qos[port][QOS_FLAG] == QOS_OFF:
+                    self.add_qos(port)
+
+
         # 1が通信帯域ないと
         if self.traffic[PRIORITY_1_PORT] - self.qos[PRIORITY_1_PORT][TRAFFIC] < self.base[PRIORITY_1_PORT]:
 
             # 2~4をドロップ
             # dcを用いてドロップするフローを選択
             if min([w2, w3, w4]) == w2:
-                self.drop_flow(self, PRIORITY_2_PORT)
+                if self.qos[port][QOS_FLAG] == QOS_ON:
+                    self.drop_flow(self, PRIORITY_2_PORT)
+                    self.del_qos(self, PRIORITY_2_PORT)
             elif min([w2, w3, w4]) == w3:
-                self.drop_flow(self, PRIORITY_3_PORT)
+                if self.qos[port][QOS_FLAG] == QOS_ON:
+                    self.drop_flow(self, PRIORITY_3_PORT)
+                    self.del_qos(self, PRIORITY_3_PORT)
             elif min([w2, w3, w4]) == w4:
-                self.drop_flow(self, PRIORITY_4_PORT)
-
+                if self.qos[port][QOS_FLAG] == QOS_ON:
+                    self.drop_flow(self, PRIORITY_4_PORT)
+                    self.del_qos(self, PRIORITY_4_PORT)
 
             # 2が通信帯域ないと
             if self.traffic[PRIORITY_2_PORT] - self.qos[PRIORITY_2_PORT][TRAFFIC] < self.base[PRIORITY_2_PORT]:
@@ -221,9 +234,13 @@ class Device4Gateway(switch_hub.SwitchHub):
                 # 3~4をドロップ
                 # dcを用いてドロップするフローを選択
                 if min([w3, w4]) == w3:
-                    self.drop_flow(self, PRIORITY_3_PORT)
+                    if self.qos[port][QOS_FLAG] == QOS_ON:
+                        self.drop_flow(self, PRIORITY_3_PORT)
+                        self.del_qos(self, PRIORITY_3_PORT)
                 if min([w3, w4]) == w4:
-                    self.drop_flow(self, PRIORITY_4_PORT)
+                    if self.qos[port][QOS_FLAG] == QOS_ON:
+                        self.drop_flow(self, PRIORITY_4_PORT)
+                        self.del_qos(self, PRIORITY_4_PORT)
 
 
     
