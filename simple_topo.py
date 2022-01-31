@@ -21,7 +21,7 @@ class MyTopo( Topo ):
         # Add hosts and switches
         gateway = self.addSwitch( 's1' )
 
-        serv = self.addHost(' h1 ')
+        serv = self.addHost( 'h1' )
         
         device1 = self.addHost( 'h2' )
         device2 = self.addHost( 'h3' )
