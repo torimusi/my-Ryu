@@ -23,11 +23,17 @@ class MyTopo( Topo ):
 
         serv = self.addHost(' sv ')
         
-        Switch = self.addSwitch( 's1' )
+        device1 = self.addHost( 'd1' )
+        device2 = self.addHost( 'd2' )
+        device3 = self.addHost( 'd3' )
+        device4 = self.addHost( 'd4' )
         
         # Add links
-        self.addLink( gateway, Switch )
+        self.addLink( gateway, serv )
         
-        self.addLink( Switch, serv )
+        self.addLink( device1, serv )
+        self.addLink( device2, serv )
+        self.addLink( device3, serv )
+        self.addLink( device4, serv )
         
 topos = { 'mytopo': ( lambda: MyTopo() ) }
