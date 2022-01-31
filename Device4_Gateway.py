@@ -1,5 +1,5 @@
 # 4つのデバイスと外部ルータをつなぐゲートウェイ
-from ryu.app import switch_hub
+import switch_hub
 
 from ryu.controller import ofp_event
 from ryu.controller.handler import MAIN_DISPATCHER
