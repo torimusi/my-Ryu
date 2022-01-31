@@ -197,18 +197,17 @@ class Device4Gateway(switch_hub.SwitchHub):
     # アドミッション制御
     def addmission_control(self):
 
-        w2 = self.dc[PRIORITY_2_PORT] * (5 - PRIORITY_2_PORT)
+        w2 = self.dc[PRIORITY_2_PORT] * (6 - PRIORITY_2_PORT)
 
-        w3 = self.dc[PRIORITY_3_PORT] * (5 - PRIORITY_3_PORT)
+        w3 = self.dc[PRIORITY_3_PORT] * (6 - PRIORITY_3_PORT)
 
-        w4 = self.dc[PRIORITY_4_PORT] * (5 - PRIORITY_4_PORT)
+        w4 = self.dc[PRIORITY_4_PORT] * (6 - PRIORITY_4_PORT)
 
         # 消したフローを再登録
         for port in self.traffic.keys():
             if self.traffic[port] - self.qos[port][TRAFFIC] > self.base[port]:
                 if self.qos[port][QOS_FLAG] == QOS_OFF:
                     self.add_qos(port)
-
 
         # 1が通信帯域ないと
         if self.traffic[PRIORITY_1_PORT] - self.qos[PRIORITY_1_PORT][TRAFFIC] < self.base[PRIORITY_1_PORT]:
