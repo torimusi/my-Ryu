@@ -216,16 +216,16 @@ class Device4Gateway(switch_hub.SwitchHub):
             # dcを用いてドロップするフローを選択
             if min([w2, w3, w4]) == w2:
                 if self.qos[PRIORITY_2_PORT][QOS_FLAG] == QOS_ON:
-                    self.drop_flow(self, port=PRIORITY_2_PORT)
-                    self.del_qos(self, port=PRIORITY_2_PORT)
+                    self.drop_flow(PRIORITY_2_PORT)
+                    self.del_qos(PRIORITY_2_PORT)
             elif min([w2, w3, w4]) == w3:
                 if self.qos[PRIORITY_3_PORT][QOS_FLAG] == QOS_ON:
-                    self.drop_flow(self, port=PRIORITY_3_PORT)
-                    self.del_qos(self, port=PRIORITY_3_PORT)
+                    self.drop_flow(PRIORITY_3_PORT)
+                    self.del_qos(PRIORITY_3_PORT)
             elif min([w2, w3, w4]) == w4:
                 if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
-                    self.drop_flow(self, port=PRIORITY_4_PORT)
-                    self.del_qos(self, port=PRIORITY_4_PORT)
+                    self.drop_flow(PRIORITY_4_PORT)
+                    self.del_qos(PRIORITY_4_PORT)
 
             # 2が通信帯域ないと
             if self.traffic[PRIORITY_2_PORT] - self.qos[PRIORITY_2_PORT][TRAFFIC] < self.base[PRIORITY_2_PORT]:
@@ -234,9 +234,9 @@ class Device4Gateway(switch_hub.SwitchHub):
                 # dcを用いてドロップするフローを選択
                 if min([w3, w4]) == w3:
                     if self.qos[PRIORITY_3_PORT][QOS_FLAG] == QOS_ON:
-                        self.drop_flow(self, port=PRIORITY_3_PORT)
-                        self.del_qos(self, port=PRIORITY_3_PORT)
+                        self.drop_flow(PRIORITY_3_PORT)
+                        self.del_qos(PRIORITY_3_PORT)
                 if min([w3, w4]) == w4:
                     if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
-                        self.drop_flow(self, port=PRIORITY_4_PORT)
-                        self.del_qos(self, port=PRIORITY_4_PORT)
+                        self.drop_flow(PRIORITY_4_PORT)
+                        self.del_qos(PRIORITY_4_PORT)
