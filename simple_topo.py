@@ -19,21 +19,21 @@ class MyTopo( Topo ):
         "Create custom topo."
 
         # Add hosts and switches
-        gateway = self.addSwitch( 'g1' )
+        gateway = self.addSwitch( 's1' )
 
-        serv = self.addHost(' sv ')
+        serv = self.addHost(' h1 ')
         
-        device1 = self.addHost( 'd1' )
-        device2 = self.addHost( 'd2' )
-        device3 = self.addHost( 'd3' )
-        device4 = self.addHost( 'd4' )
+        device1 = self.addHost( 'h2' )
+        device2 = self.addHost( 'h3' )
+        device3 = self.addHost( 'h4' )
+        device4 = self.addHost( 'h5' )
         
         # Add links
-        self.addLink( gateway, serv )
+        self.addLink( serv, gateway )
         
-        self.addLink( device1, serv )
-        self.addLink( device2, serv )
-        self.addLink( device3, serv )
-        self.addLink( device4, serv )
+        self.addLink( device1, gateway )
+        self.addLink( device2, gateway )
+        self.addLink( device3, gateway )
+        self.addLink( device4, gateway )
         
 topos = { 'mytopo': ( lambda: MyTopo() ) }
