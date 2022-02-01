@@ -51,6 +51,18 @@ class SwitchHub(app_manager.RyuApp):
 
         datapath.send_msg(mod)
 
+    def drop_flow(self, datapath, mac):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        match = parser.OFPMatch(dl_dst=mac)
+
+        actions = []
+
+        mod = parser.OFPFlowMod(datapath=datapath, match=match, cookie=0, idle_timeout=MAC_IDLE_TIME, command=ofproto.OFPFC_MODIFY,actions=actions)
+
+        datapath.send_msg(mod)
+
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
         msg = ev.msg
