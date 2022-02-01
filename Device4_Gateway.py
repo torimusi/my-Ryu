@@ -32,8 +32,12 @@ PRIORITY_3_TOS = 8
 PRIORITY_4_TOS = 4
 
 ROUTER_MAC = '00:00:00:00:00:01'
-ROUTER_PORT = 1
+PORT1_MAC = '00:00:00:00:00:02'
+PORT2_MAC = '00:00:00:00:00:03'
+PORT3_MAC = '00:00:00:00:00:04'
+PORT4_MAC = '00:00:00:00:00:05'
 
+ROUTER_PORT = 1
 PRIORITY_1_PORT = 2
 PRIORITY_2_PORT = 3
 PRIORITY_3_PORT = 4
@@ -224,6 +228,7 @@ class Device4Gateway(switch_hub.SwitchHub):
                     self.del_qos(PRIORITY_3_PORT)
             elif min([w2, w3, w4]) == w4:
                 if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
+                    switch_hub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.drop_flow(PRIORITY_4_PORT)
                     self.del_qos(PRIORITY_4_PORT)
 
