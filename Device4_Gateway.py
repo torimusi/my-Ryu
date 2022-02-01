@@ -201,11 +201,17 @@ class Device4Gateway(switch_hub.SwitchHub):
     # アドミッション制御
     def addmission_control(self):
 
+        switchhub = switch_hub.SwitchHub()
+        switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+        switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+
         w2 = self.dc[PRIORITY_2_PORT] * (6 - PRIORITY_2_PORT)
 
         w3 = self.dc[PRIORITY_3_PORT] * (6 - PRIORITY_3_PORT)
 
         w4 = self.dc[PRIORITY_4_PORT] * (6 - PRIORITY_4_PORT)
+
+        #switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
 
         # 消したフローを再登録
         for port in self.traffic.keys():
@@ -228,7 +234,6 @@ class Device4Gateway(switch_hub.SwitchHub):
                     self.del_qos(PRIORITY_3_PORT)
             elif min([w2, w3, w4]) == w4:
                 if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
-                    switch_hub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.drop_flow(PRIORITY_4_PORT)
                     self.del_qos(PRIORITY_4_PORT)
 
