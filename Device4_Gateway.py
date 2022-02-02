@@ -10,7 +10,7 @@ from ryu.lib.packet import ether_types as types
 
 # アドミッション制御に用いる変数を定義
 INIT_TIME    = 10
-POLLING_TIME = 60
+POLLING_TIME = 30
 REPLY_TIME   = 3
 
 QOS_FLAG      = 'flag'
@@ -207,18 +207,24 @@ class Device4Gateway(switch_hub.SwitchHub):
 
         #actions = [parser.OFPActionOutput(ROUTER_PORT)]
 
-        a = 1
+        #a = 1
 
         switchhub = switch_hub.SwitchHub()
 
-        if a > 0:
-            switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
-            a = a * -1
+        switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+        switchhub.del_dropped_flow(self.datapath)
+
+        #if a > 0:
+        #    switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+        #    a += 1
         
         #switchhub.modify_flow(self.datapath, haddr_to_bin(PORT4_MAC), ROUTER_PORT)
         #switchhub.add_flow(self.datapath, PRIORITY_4_PORT, haddr_to_bin(PORT4_MAC), haddr_to_bin(ROUTER_PORT), actions)
         #switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
-        switchhub.del_dropped_flow(self.datapath)
+
+        #if a > 5:
+        #    switchhub.del_dropped_flow(self.datapath)
+        #    a = a - 5
 
         w2 = self.dc[PRIORITY_2_PORT] * (6 - PRIORITY_2_PORT)
 
