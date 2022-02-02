@@ -43,6 +43,8 @@ PRIORITY_2_PORT = 3
 PRIORITY_3_PORT = 4
 PRIORITY_4_PORT = 5
 
+GATEWAY_PORT4 = '10.0.0.5'
+
 PRIORITY_1_DC = 1
 PRIORITY_2_DC = 1
 PRIORITY_3_DC = 1
@@ -200,10 +202,23 @@ class Device4Gateway(switch_hub.SwitchHub):
 
     # アドミッション制御
     def addmission_control(self):
+        #ofproto = self.datapath.ofproto
+        #parser = self.datapath.ofproto_parser
+
+        #actions = [parser.OFPActionOutput(ROUTER_PORT)]
+
+        a = 1
 
         switchhub = switch_hub.SwitchHub()
-        #switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+
+        if a > 0:
+            switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+            a = a * -1
+        
         #switchhub.modify_flow(self.datapath, haddr_to_bin(PORT4_MAC), ROUTER_PORT)
+        #switchhub.add_flow(self.datapath, PRIORITY_4_PORT, haddr_to_bin(PORT4_MAC), haddr_to_bin(ROUTER_PORT), actions)
+        #switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+        switchhub.del_dropped_flow(self.datapath)
 
         w2 = self.dc[PRIORITY_2_PORT] * (6 - PRIORITY_2_PORT)
 
@@ -232,8 +247,8 @@ class Device4Gateway(switch_hub.SwitchHub):
                     self.del_qos(PRIORITY_3_PORT)
             elif min([w2, w3, w4]) == w4:
                 if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
-                    switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
-                    switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+                    #switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
+                    #switchhub.del_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.drop_flow(PRIORITY_3_PORT)
                     self.del_qos(PRIORITY_4_PORT)
 

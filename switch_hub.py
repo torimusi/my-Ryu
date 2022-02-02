@@ -59,7 +59,15 @@ class SwitchHub(app_manager.RyuApp):
 
         actions = []
 
-        mod = parser.OFPFlowMod(datapath=datapath, match=match, cookie=0, idle_timeout=MAC_IDLE_TIME, command=ofproto.OFPFC_MODIFY,actions=actions)
+        mod = parser.OFPFlowMod(datapath=datapath, match=match, cookie=1, idle_timeout=MAC_IDLE_TIME, command=ofproto.OFPFC_MODIFY,actions=actions)
+
+        datapath.send_msg(mod)
+
+    def del_dropped_flow(self, datapath):
+        ofproto = datapath.ofproto
+        parser = datapath.ofproto_parser
+
+        mod = parser.OFPFlowMod(datapath=datapath, cookie=1, command=ofproto.OFPFC_DELETE)
 
         datapath.send_msg(mod)
 
