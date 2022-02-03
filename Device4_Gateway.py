@@ -20,10 +20,10 @@ QOS_IDLE_TIME = 0
 QOS_PRIORITY  = 65535
 
 TRAFFIC = 'traffic'
-PRIORITY_1_TRAFFIC = 100 * (10 ** 6)
-PRIORITY_2_TRAFFIC = 300 * (10 ** 6)
-PRIORITY_3_TRAFFIC = 200 * (10 ** 6)
-PRIORITY_4_TRAFFIC = 100 * (10 ** 6)
+PRIORITY_1_TRAFFIC = 100 * (10 ** 2)
+PRIORITY_2_TRAFFIC = 300 * (10 ** 2)
+PRIORITY_3_TRAFFIC = 200 * (10 ** 2)
+PRIORITY_4_TRAFFIC = 100 * (10 ** 2)
 
 TOS            = 'tos'
 PRIORITY_1_TOS = 32
@@ -204,6 +204,8 @@ class Device4Gateway(switch_hub.SwitchHub):
     # アドミッション制御
     def addmission_control(self):
 
+        print('a')
+
         switchhub = switch_hub.SwitchHub()
 
         switchhub.del_dropped_flow(self.datapath)
@@ -235,6 +237,7 @@ class Device4Gateway(switch_hub.SwitchHub):
                         #self.drop_flow(PRIORITY_3_PORT)
                         #self.del_qos(PRIORITY_3_PORT)
                 elif min([w4, w3]) == w4:
+                    print('b')
                     switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.dc[PRIORITY_4_PORT] += 1
                     #if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
@@ -258,6 +261,7 @@ class Device4Gateway(switch_hub.SwitchHub):
                         #self.drop_flow(PRIORITY_3_PORT)
                         #self.del_qos(PRIORITY_3_PORT)
                 elif min([w4, w3, w2]) == w4:
+                    print('c')
                     switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.dc[PRIORITY_4_PORT] += 1
                     #if self.qos[PRIORITY_4_PORT][QOS_FLAG] == QOS_ON:
@@ -275,5 +279,9 @@ class Device4Gateway(switch_hub.SwitchHub):
                     switchhub.drop_flow(self.datapath, haddr_to_bin(PORT3_MAC))
                     self.dc[PRIORITY_3_PORT] += 1
                 elif min([w4, w3]) == w4:
+                    print('d')
                     switchhub.drop_flow(self.datapath, haddr_to_bin(PORT4_MAC))
                     self.dc[PRIORITY_4_PORT] += 1
+
+        print('e')
+
