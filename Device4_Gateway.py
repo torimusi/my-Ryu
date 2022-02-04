@@ -10,7 +10,7 @@ from ryu.lib.packet import ether_types as types
 
 # アドミッション制御に用いる変数を定義
 INIT_TIME    = 10
-POLLING_TIME = 30
+POLLING_TIME = 15
 REPLY_TIME   = 3
 
 QOS_FLAG      = 'flag'
